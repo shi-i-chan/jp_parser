@@ -30,7 +30,7 @@ Text files with lists of words and hieroglyphs, as well as these lists separatel
 
 File `kanji_df.xlsx` will appear in folder `japanese_word_kanji_parser\table`.
 
-![image](https://github.com/shi-i-chan/japanese_word_kanji_parser/blob/main/screens/kanjis_df.png)
+![image](https://github.com/shi-i-chan/jp_parser/blob/main/screens/kanjis_df.png)
 
 </ul>
 
@@ -40,7 +40,7 @@ File `kanji_df.xlsx` will appear in folder `japanese_word_kanji_parser\table`.
 
 File `words_df.xlsx` will appear in folder `japanese_word_kanji_parser\table`.
 
-![image](https://github.com/shi-i-chan/japanese_word_kanji_parser/blob/main/screens/words_df.png)
+![image](https://github.com/shi-i-chan/jp_parser/blob/main/screens/words_df.png)
 
 </ul>
 
@@ -50,6 +50,6 @@ File `words_df.xlsx` will appear in folder `japanese_word_kanji_parser\table`.
 
 File `radicals.xlsx` will appear in folder `japanese_word_kanji_parser\table`.
 
-![image](https://github.com/shi-i-chan/japanese_word_kanji_parser/blob/main/screens/radicals.png)
+![image](https://github.com/shi-i-chan/jp_parser/blob/main/screens/radicals.png)
 
 </ul>
