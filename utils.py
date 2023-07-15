@@ -40,10 +40,22 @@ def lines_to_txt(fn: str, new_lines: List[str], mode: str = 'a') -> NoReturn:
         f.write("\n")
 
 
-def get_new_items(kind: str) -> List[str]:
+def get_new_words():
+    new_lines = read_lines(getattr(config, f'new_words_fn'))
+    new_items = [new_line.split(' ')[0] for new_line in new_lines]
+    new_ids = [new_line.split(' ')[1] for new_line in new_lines]
+    exist_ids = pd.read_excel(getattr(config, f'words_df_fn'), index_col=0)['id'].tolist()
+    new_items_indices = []
+    for i in range(len(new_ids)):
+        if new_ids[i] not in exist_ids:
+            new_items_indices.append(i)
+    return [new_lines[i] for i in new_items_indices]
+
+
+def get_new_kanjis() -> List[str]:
     """ Get new kanjis """
-    new_items = read_lines(getattr(config, f'new_{kind}_fn'))
-    exist_items = pd.read_excel(getattr(config, f'{kind}_df_fn'), index_col=0)[kind].tolist()
+    new_items = read_lines(getattr(config, f'new_kanjis_fn'))
+    exist_items = pd.read_excel(getattr(config, f'kanjis_df_fn'), index_col=0)[kind].tolist()
     new_items = [new_item for new_item in new_items if new_item not in exist_items]
     return new_items
 
@@ -54,12 +66,13 @@ def update_df(new_df: pd.DataFrame, kind: str) -> NoReturn:
         old_df = pd.read_excel(getattr(config, f'{kind}_df_fn'), index_col=0)
         new_df = pd.concat([old_df, new_df])
         new_df = new_df.sort_values(by=['known', 'level'],
-                                    ascending=[True, False]).drop_duplicates().reset_index(drop=True)
+                                    ascending=[True, False]).reset_index(drop=True)
         new_df.to_excel(getattr(config, f'{kind}_df_fn'))
 
 
 def process_new_items(func: Callable, kind: str, chunk_size: int = 10) -> NoReturn:
-    new_items = get_new_items(kind)
+    mirror = {'words': get_new_words, 'kanjis': get_new_kanjis}
+    new_items = mirror[kind]()
     if new_items:
         chunks = np.array_split(new_items, math.ceil(len(new_items) / chunk_size))
         for chunk in tqdm(chunks, total=len(chunks), desc=' chunks'):

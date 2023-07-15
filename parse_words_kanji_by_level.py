@@ -1,4 +1,5 @@
 import os
+import re
 
 import utils
 import config
@@ -25,9 +26,12 @@ def get_items(level: int, kind: str = 'words') -> List[str]:
     items = []
     for counter, page_num in tqdm(enumerate(pages, start=1), total=len(pages), desc=' pages'):
         if soup := utils.get_soup(def_url + str(page_num)):
-            if all_spans := soup.findAll('span', attrs={'class': 'xlarge text-normal me-4'}):
-                for span in all_spans:
-                    items.append(span.text)
+            all_span = soup.findAll('span', attrs={'class': 'xlarge text-normal me-4'})
+            all_a = soup.findAll('a', attrs={'class': 'list-group-item list-group-item-action my-2 mdshadow-1'})
+            all_a = [' ' + re.search(r'#entry-(\d+)', a['href']).group(1) for a in all_a] if kind =='words' else ['' for _ in range(len(all_a))]
+            if all_span:
+                for a, span in zip(all_a, all_span):
+                    items.append(f'{span.text}{a}')
     return items
 
 

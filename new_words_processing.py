@@ -9,7 +9,7 @@ from typing import List, Tuple, Union
 
 # create table if not exist
 if not os.path.isfile(config.words_df_fn):
-    df = pd.DataFrame(columns=['words', 'reading', 'translate', 'level', 'known'])
+    df = pd.DataFrame(columns=['words', 'reading', 'translate', 'level', 'id', 'known'])
     df.to_excel(config.words_df_fn)
 
 
@@ -43,26 +43,31 @@ def get_translate(soup: bs) -> str:
     return translates
 
 
-def parse_data(words: List[str]) -> Tuple[List[str], List[int], List[str]]:
+def parse_data(elements: List[str]) -> Tuple[List[str], List[int], List[str]]:
     """ Get all words info """
-    link = 'https://www.japandict.com/'
     readings, levels, translates = [[] for i in range(3)]
-    for counter, word in enumerate(words, start=1):
-        if soup := utils.get_soup(link + word):
+    for counter, element in enumerate(elements, start=1):
+        word, id_ = element.split(' ')
+        url = f'https://www.japandict.com/{word}#entry-{id_}'
+        if soup := utils.get_soup(url):
+            soup = soup.find('div', attrs={'id': f'entry-{id_}'})
             readings += [get_reading(soup)]
             levels += [get_level(soup)]
             translates += [get_translate(soup)]
     return readings, levels, translates
 
 
-def get_new_words(new_words: List[str]) -> pd.DataFrame:
+def get_new_words(elements: List[str]) -> pd.DataFrame:
     """" Get new words dataframe """
-    readings, levels, translates = parse_data(new_words)
-    df = pd.DataFrame({'words': new_words,
+    readings, levels, translates = parse_data(elements)
+    words, ids = [element.split(' ')[0] for element in elements], [element.split(' ')[1] for element in elements]
+    df = pd.DataFrame({'words': words,
                        'reading': readings,
                        'translate': translates,
-                       'level': levels})
+                       'level': levels,
+                       'id': ids})
     df['known'] = ""
+    df = df.drop_duplicates(subset=['id']).reset_index(drop=True)
     return df
 
 
